@@ -1,12 +1,14 @@
+use itertools::Itertools;
+
 fn main() {
     let input = std::fs::read_to_string("input").unwrap();
-    let mut groups: Vec<i32> = input
+    let groups: Vec<i32> = input
         .split("\n\n")
         .map(|group| group.split("\n").map(|cal| cal.parse::<i32>().unwrap()))
         .map(|g| g.sum())
+        .sorted()
+        .rev()
         .collect();
-
-    groups.sort_by(|a, b| b.partial_cmp(a).unwrap());
 
     let first = groups.first().unwrap();
 
