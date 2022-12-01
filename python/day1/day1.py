@@ -1,11 +1,6 @@
 groups = open("input").read().split("\n\n")
 
-totals = []
-for group in groups:
-    total = 0
-    for line in group.split("\n"):
-        total += int(line)
-    
-    totals.append(total)
+totals = [sum([int(x) for x in group.split("\n")]) for group in groups].sort(reverse=True)
 
-print(sum(sorted(totals, reverse=True)[0:3]))
+print(totals[0])
+print(sum(totals[0:3]))
