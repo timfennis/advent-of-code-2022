@@ -25,7 +25,7 @@ fn main() {
 
     for group in groups.into_iter() {
         let inters = group
-            .map(|g| g.chars().collect::<HashSet<char>>())
+            .map(|g| g.chars().collect())
             .fold(dict.chars().collect::<HashSet<char>>(), |total, set| {
                 total.intersection(&set).map(|x| *x).collect()
             });
