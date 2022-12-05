@@ -6,9 +6,9 @@ config, input = input.split('\n\n')
 stacks = [list('') for _ in range(0, 9)]
 
 for l in config.split('\n'):
-    for idx, c in enumerate(l):
+    for idx, c in enumerate(l[1::4]):
         if c.isalnum():
-            stacks[(idx - 1) // 4].insert(0, c)
+            stacks[idx].insert(0, c)
 
 def part1(stacks: list[str], fr: int, to: int, cnt: int):
     stacks[to] = stacks[to] + stacks[fr][-cnt:][::-1]
