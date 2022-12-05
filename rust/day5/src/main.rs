@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use scan_fmt::scan_fmt;
 
 fn main() {
@@ -28,20 +29,19 @@ fn solve(part1: bool) {
     for line in moves.lines() {
         let (amount, from, to) =
             scan_fmt!(line, "move {d} from {d} to {d}", usize, usize, usize).unwrap();
-        let from_stack = stacks.get_mut(from - 1).unwrap();
-        let mut slice = from_stack[from_stack.len() - amount..from_stack.len()].to_vec();
+
+        let from_len = stacks[from - 1].len();
+        let mut slice = stacks[from - 1][from_len - amount..from_len].to_vec();
+
         if part1 {
             slice.reverse();
         }
-        from_stack.truncate(from_stack.len() - amount);
 
-        let to_stack = stacks.get_mut(to - 1).unwrap();
-        to_stack.append(&mut slice);
+        stacks[from - 1].truncate(from_len - amount);
+        stacks[to - 1].append(&mut slice);
     }
 
-    let top = stacks.iter()
-        .map(|stack| stack.last().unwrap())
-        .fold(String::new(), |s, c| format!("{}{}", s, c));
-    
+    let top = stacks.iter().map(|stack| stack.last().unwrap()).join("");
+
     println!("{}", top);
 }
