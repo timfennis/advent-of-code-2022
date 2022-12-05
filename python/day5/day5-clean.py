@@ -1,4 +1,5 @@
 from copy import deepcopy
+import re
 
 input = open('input').read()
 config, input = input.split('\n\n')
@@ -23,13 +24,9 @@ p1 = deepcopy(stacks)
 p2 = deepcopy(stacks)
 
 for line in input.split('\n'):
-    a, to = line.split(' to ')
-    b, fr = a.split(' from ')
-    _, cn = b.split('e ')
-    to, fr, cn = int(to) - 1, int(fr) - 1, int(cn)
-
-    p1 = part1(p1, fr, to, cn)
-    p2 = part2(p2, fr, to, cn)
+    to, fr, cn = [int(it) for it in re.findall("\d", line)]
+    p1 = part1(p1, fr - 1, to - 1, cn)
+    p2 = part2(p2, fr - 1, to - 1, cn)
 
 p1a = ''.join([stack[-1] for stack in p1])
 assert p1a == 'CVCWCRTVQ'
