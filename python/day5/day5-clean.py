@@ -10,17 +10,13 @@ for l in config.split('\n'):
             stacks[(idx - 1) // 4].insert(0, c)
 
 def part1(stacks: list[str], fr: int, to: int, cnt: int):
-    move = stacks[fr][-cnt:]
-    stacks[fr] = stacks[fr][:-cnt]
-    
-    stacks[to] = stacks[to] + move[::-1]
+    stacks[to] = stacks[to] + stacks[fr][-cnt:][::-1]
+    stacks[fr] = stacks[fr][:-cnt] 
     return stacks
 
 def part2(stacks: list[str], fr: int, to: int, cnt: int):
-    move = stacks[fr][-cnt:]
-    stacks[fr] = stacks[fr][:-cnt]
-    
-    stacks[to] = stacks[to] + move
+    stacks[to] = stacks[to] + stacks[fr][-cnt:]
+    stacks[fr] = stacks[fr][:-cnt] 
     return stacks
 
 p1 = deepcopy(stacks)
@@ -35,5 +31,9 @@ for line in input.split('\n'):
     p1 = part1(p1, fr, to, cn)
     p2 = part2(p2, fr, to, cn)
 
-print(''.join([stack[-1] for stack in p1]))
-print(''.join([stack[-1] for stack in p2]))
+p1a = ''.join([stack[-1] for stack in p1])
+assert p1a == 'CVCWCRTVQ'
+print(p1a)
+p2a = ''.join([stack[-1] for stack in p2])
+assert p2a == 'CNSCZWLVT'
+print(p2a)
