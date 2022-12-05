@@ -24,7 +24,7 @@ p1 = deepcopy(stacks)
 p2 = deepcopy(stacks)
 
 for line in input.split('\n'):
-    to, fr, cn = [int(it) for it in re.findall("\d", line)]
+    cn, fr, to = [int(it) for it in re.findall(r"(\d+)", line)]
     p1 = part1(p1, fr - 1, to - 1, cn)
     p2 = part2(p2, fr - 1, to - 1, cn)
 
