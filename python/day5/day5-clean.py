@@ -1,27 +1,13 @@
+from copy import deepcopy
+
 input = open('input').read()
-_, input = input.split('\n\n')
+config, input = input.split('\n\n')
+stacks = [list('') for _ in range(0, 9)]
 
-#     [P]                 [C] [C]    
-#     [W]         [B]     [G] [V] [V]
-#     [V]         [T] [Z] [J] [T] [S]
-#     [D] [L]     [Q] [F] [Z] [W] [R]
-#     [C] [N] [R] [H] [L] [Q] [F] [G]
-# [F] [M] [Z] [H] [G] [W] [L] [R] [H]
-# [R] [H] [M] [C] [P] [C] [V] [N] [W]
-# [W] [T] [P] [J] [C] [G] [W] [P] [J]
-#  1   2   3   4   5   6   7   8   9 
-
-stacks = [
-    list('WRF'),
-    list('THMCDVWP'),
-    list('PMZNL'),
-    list('JCHR'),
-    list('CPGHQTB'),
-    list('GCWLFZ'),
-    list('WVLQZJGC'),
-    list('PNRFWTVC'),
-    list('JWHGRSV'),
-]
+for l in config.split('\n'):
+    for idx, c in enumerate(l):
+        if c.isalnum():
+            stacks[(idx - 1) // 4].insert(0, c)
 
 def part1(stacks: list[str], fr: int, to: int, cnt: int):
     move = stacks[fr][-cnt:]
@@ -37,8 +23,8 @@ def part2(stacks: list[str], fr: int, to: int, cnt: int):
     stacks[to] = stacks[to] + move
     return stacks
 
-p1 = stacks.copy()
-p2 = stacks.copy()
+p1 = deepcopy(stacks)
+p2 = deepcopy(stacks)
 
 for line in input.split('\n'):
     a, to = line.split(' to ')
