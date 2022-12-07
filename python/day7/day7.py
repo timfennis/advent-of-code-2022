@@ -29,6 +29,10 @@ for line in lines:
             dir_history.append(current_dir)
         else:
             print("Unexpected dir", dir_cmd)
+    elif line.startswith('$ ls'):
+        continue
+    elif line.startswith('dir'):
+        continue
     else:
         size, name = line.split(' ')
         size = int(size)
