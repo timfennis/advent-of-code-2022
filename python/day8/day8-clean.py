@@ -1,12 +1,7 @@
 input = open('input').read()
 lines = input.split('\n')
 
-grid = []
-for line in lines:
-    row = []
-    for c in line:
-        row.append(int(c))
-    grid.append(row);
+grid = [[int(c) for c in row] for row in lines]
 width, height = len(grid[0]), len(grid)
 
 trees = set()
