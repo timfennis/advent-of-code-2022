@@ -2,17 +2,17 @@ use std::collections::{HashMap, HashSet};
 
 use scan_fmt::scan_fmt;
 
-fn main () {
-    let visited = solve(); 
+fn main() {
+    let visited = solve::<10>();
     println!("{}\n{}", visited[1].len(), visited[9].len());
 }
 
-fn solve() -> Vec<HashSet<(i32, i32)>> {
+fn solve<const N: usize>() -> Vec<HashSet<(i32, i32)>> {
     let input = include_str!("../input");
     let directions = HashMap::from([('U', (0, 1)), ('D', (0, -1)), ('L', (-1, 0)), ('R', (1, 0))]);
 
-    let mut rope = [(0, 0); 10];
-    let mut visited: Vec<HashSet<(i32, i32)>> = (0..10).map(|_| HashSet::new()).collect::<Vec<_>>();
+    let mut rope = [(0, 0); N];
+    let mut visited: Vec<HashSet<(i32, i32)>> = (0..N).map(|_| HashSet::new()).collect::<Vec<_>>();
 
     for line in input.lines() {
         let (d, n) = scan_fmt!(line, "{} {}", char, u16).unwrap();
@@ -33,5 +33,5 @@ fn solve() -> Vec<HashSet<(i32, i32)>> {
         }
     }
 
-    return visited;        
+    return visited;
 }
