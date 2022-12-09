@@ -1,22 +1,15 @@
 lines = [line for line in open('input').read().split('\n')]
 
-dirs = {
-    "U": (0, 1),
-    "D": (0, -1),
-    "R": (1, 0),
-    "L": (-1, 0),
-}
-
 def clamp(i: int) -> int:
-    if i in [1, 2]:
+    if i == 2 or i == 1:
         return 1
-    elif i in [-1, -2]:
+    elif i == -2 or i == -1:
         return -1
     elif i == 0:
         return 0
     else:
-        raise ValueError(f"unexpected {i}")
-
+        print("PANIC", i)
+        exit()
 def simulate(lines: list[str], snek_len: int):
     rope = [(0, 0) for _ in range(snek_len)]
     visited = set([(0, 0)])
@@ -25,24 +18,34 @@ def simulate(lines: list[str], snek_len: int):
         n_steps = int(line[1:])
 
         for _ in range(n_steps):
-            dx, dy = dirs[direction]
-            rope[0] = (rope[0][0] + dx, rope[0][1] + dy)
+            if direction == 'U':
+                rope[0] = (rope[0][0], rope[0][1]+1)
+            elif direction == 'D':
+                rope[0] = (rope[0][0], rope[0][1]-1)
+            elif direction == 'L':
+                rope[0] = (rope[0][0] - 1, rope[0][1])
+            elif direction == 'R':
+                rope[0] = (rope[0][0] + 1, rope[0][1])
 
             for idx in range(1, len(rope)):
                 dx = rope[idx-1][0] - rope[idx][0]
                 dy = rope[idx-1][1] - rope[idx][1]
 
                 if abs(dx) in [1,0] and abs(dy) in [1,0]:
-                    pass # do nothing
+                    # do nothing 
+                    continue
                 else:
-                    rope[idx] = (rope[idx][0] + clamp(dx), rope[idx][1] + clamp(dy))
+                    dx = clamp(dx)
+                    dy = clamp(dy) 
                 
-            visited.add(rope[-1])
+                rope[idx] = (rope[idx][0] + dx, rope[idx][1] + dy)
+                
+                if idx == len(rope) - 1:
+                    visited.add((rope[idx][0], rope[idx][1]))
     return visited   
 
 p1 = len(set(simulate(lines, 2)))
 p2 = len(set(simulate(lines, 10)))
-print(p1, p2, sep="\n")
 assert p1 == 6284
 assert p2 == 2661
 print(p1, p2, sep="\n")
