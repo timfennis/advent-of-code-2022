@@ -49,9 +49,9 @@ for part in [1,2]:
                 inspections[monkey_idx] += 1
                 new_level = ops[monkey_idx](item)
                 if part == 1:
-                    new_level = new_level // 3
+                    new_level //= 3
                 else:
-                    new_level = new_level % l
+                    new_level %= l
                 on_true, on_false = target[monkey_idx]
                 if new_level % divs[monkey_idx] == 0:
                     items[on_true].append(new_level)
