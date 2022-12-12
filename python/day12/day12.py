@@ -26,7 +26,8 @@ def find_shortest_path(sx, sy, reverse = False):
     paths[(sy, sx)] = 0
     should_search = [(sx, sy, 0)]
     while len(should_search) > 0:
-        x, y, steps = should_search.pop()
+        x, y, steps = should_search[0]
+        should_search = should_search[1:]
         from_height = ord(grid[y][x])
 
         for (dx, dy) in directions:
