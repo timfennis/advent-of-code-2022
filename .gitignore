@@ -1,3 +1,4 @@
 rust/*/target
 rust/*/input
+php/*/input
 python/*/input
