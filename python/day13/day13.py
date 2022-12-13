@@ -7,7 +7,7 @@ groups = input.split('\n\n')
 pairs = []
 for index, pair in enumerate(groups):
     lines = pair.split('\n');
-    eval("pairs.append((index, " + lines[0] + ", " + lines[1] + "))")
+    pairs.append((index, eval(lines[0]), eval(lines[1])))
 
 # There must be a way to express this more consicely right?
 def validate(p1: list, p2: list):
