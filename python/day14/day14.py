@@ -60,7 +60,6 @@ def run_simulation(input_grid: defaultdict[tuple[int, int], str], part1: bool):
     _, _, _, maxy = get_bounds(grid)
     sand_origin = (500, 0)
     continue_simulation = True
-    moves = 0
     while continue_simulation:
     # for _ in range(24):
         # Spawn 1 below the origin
@@ -69,7 +68,6 @@ def run_simulation(input_grid: defaultdict[tuple[int, int], str], part1: bool):
             move = find_move(grid, sand, None if part1 else maxy + 2)
 
             if move == None:
-                moves += 1
                 grid[sand] = 'o'
                 if part1 == False and sand == sand_origin:
                     continue_simulation = False
