@@ -81,17 +81,14 @@ def run_simulation(input_grid: defaultdict[tuple[int, int], str], part1: bool):
     return grid
 
 # Print initial grid state
-if do_print:
-    print_state(grid)
+do_print and print_state(grid)
 
 # Print part 1
 p1_grid = run_simulation(grid, True)
-if do_print:
-    print_state(p1_grid)
+do_print and print_state(p1_grid)
 print(sum(1 for x in p1_grid.values() if x == 'o'))
 
 # Print part 2
 p2_grid = run_simulation(grid, False)
-if do_print:
-    print_state(p2_grid)
+do_print and print_state(p2_grid)
 print(sum(1 for x in p2_grid.values() if x == 'o'))
