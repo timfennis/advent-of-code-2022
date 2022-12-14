@@ -1,23 +1,22 @@
 from collections import defaultdict
 from copy import deepcopy
+import sys
 
-input = open('input').read()
+do_print = True if '--print' in sys.argv else False
+file_arg = [arg for arg in sys.argv[1:] if arg != '--print']
+input = open(file_arg[0] if len(file_arg) >= 1 else 'input').read()
 lines = input.split('\n')
 
 grid = defaultdict(lambda: '.')
 
 for line in lines:
-    path = []
-    for coord in line.split(' -> '):
-        x, y = coord.split(',')
-        path.append((int(x), int(y)))
+    path = [(int(x), int(y)) for x, y in [pair.split(',') for pair in line.split(' -> ')]]
 
-    zipped = list(zip(path, path[1:]))
-    for (sx, sy), (ex, ey) in zipped:
-        stepx = -1 if sx > ex else 1 
-        stepy = -1 if sy > ey else 1
-        for y in range(sy, ey + stepy, stepy):
-            for x in range(sx, ex + stepx, stepx):
+    for (sx, sy), (ex, ey) in list(zip(path, path[1:])):
+        sx, ex = sorted([sx, ex])
+        sy, ey = sorted([sy, ey])
+        for y in range(sy, ey + 1):
+            for x in range(sx, ex + 1):
                 grid[(x,y)] = '#'
 
 def get_bounds(grid: defaultdict[tuple[int, int], str]):
@@ -81,15 +80,20 @@ def run_simulation(input_grid: defaultdict[tuple[int, int], str], part1: bool):
                     break
                 sand = move
     
-    return (moves, grid)
+    return grid
 
 # Print initial grid state
-print_state(grid)
+if do_print:
+    print_state(grid)
 
-p1_moves, p1_grid = run_simulation(grid, True)
-print_state(p1_grid)
-print(p1_moves)
+# Print part 1
+p1_grid = run_simulation(grid, True)
+if do_print:
+    print_state(p1_grid)
+print(sum(1 for x in p1_grid.values() if x == 'o'))
 
-p2_moves, p2_grid = run_simulation(grid, False)
-print(p2_moves)
-print_state(p2_grid)
+# Print part 2
+p2_grid = run_simulation(grid, False)
+if do_print:
+    print_state(p2_grid)
+print(sum(1 for x in p2_grid.values() if x == 'o'))
