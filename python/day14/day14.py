@@ -56,7 +56,7 @@ def find_move(grid, sand, maxy):
 
 
 # Simulation time
-def run_simulation(input_grid, part1: bool):
+def run_simulation(input_grid, part1):
     grid = deepcopy(input_grid)
     _, _, _, maxy = get_bounds(grid)
     sand_origin = (500, 0)
@@ -81,10 +81,15 @@ def run_simulation(input_grid, part1: bool):
                     break
                 sand = move
     
-    return moves
+    return (moves, grid)
 
-# Print that shit brah
-
+# Print initial grid state
 print_state(grid)
-print(run_simulation(grid, True))
-print(run_simulation(grid, False))
+
+p1_moves, p1_grid = run_simulation(grid, True)
+print_state(p1_grid)
+print(p1_moves)
+
+p2_moves, p2_grid = run_simulation(grid, False)
+print(p2_moves)
+print_state(p2_grid)
