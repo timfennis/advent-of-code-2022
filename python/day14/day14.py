@@ -20,7 +20,7 @@ for line in lines:
             for x in range(sx, ex + stepx, stepx):
                 grid[(x,y)] = '#'
 
-def get_bounds(grid):
+def get_bounds(grid: defaultdict[tuple[int, int], str]):
     min_x, max_x, min_y, max_y = 999999999, 0, 999999999, 0
     for (x,y), _ in grid.items():
         if x < min_x:
@@ -39,7 +39,7 @@ def print_state(grid):
     for row in G:
         print("".join(row))
 
-def find_move(grid, sand, maxy):
+def find_move(grid: defaultdict[tuple[int, int], str], sand: tuple[int, int], maxy: int):
     down = lambda p: (p[0], p[1]+1)
     diag_left = lambda p: (p[0]-1, p[1]+1)
     diag_right = lambda p: (p[0]+1, p[1]+1)
@@ -56,7 +56,7 @@ def find_move(grid, sand, maxy):
 
 
 # Simulation time
-def run_simulation(input_grid, part1):
+def run_simulation(input_grid: defaultdict[tuple[int, int], str], part1: bool):
     grid = deepcopy(input_grid)
     _, _, _, maxy = get_bounds(grid)
     sand_origin = (500, 0)
