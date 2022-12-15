@@ -61,7 +61,6 @@ def run_simulation(input_grid: defaultdict[tuple[int, int], str], part1: bool):
     sand_origin = (500, 0)
     continue_simulation = True
     while continue_simulation:
-    # for _ in range(24):
         # Spawn 1 below the origin
         sand = (sand_origin[0], sand_origin[1])
         while True:
