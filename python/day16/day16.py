@@ -77,7 +77,6 @@ print(best)
 best = 0
 count = 0
 for p1 in possible_paths('AA', 26):
-    print(count)
     for p2 in possible_paths('AA', 26, exclude=set(p1)):
         best = max(best, path_value(tuple(p1), 26) + path_value(tuple(p2), 26))
     count += 1

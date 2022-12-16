@@ -1,3 +1,4 @@
 f = frozenset(['x'])
+g = frozenset(['y'])
 
-print(f.union(frozenset(['y'])))
+print(f | g)
