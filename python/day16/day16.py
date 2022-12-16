@@ -1,8 +1,10 @@
 import re
 import sys
 import functools
+from itertools import combinations
+from copy import copy
 
-input = open(sys.argv[1] if len(sys.argv) >= 2 else 'input').read()
+input = open(sys.argv[1] if len(sys.argv) >= 2 else 'example').read()
 
 FLOW_RATES = dict()
 NETWORK = dict()
@@ -13,51 +15,70 @@ for line in input.split('\n'):
     NETWORK[pipe] = connections.split(', ')
     FLOW_RATES[pipe] = rate
 
-def unpack_nodes(n: str) -> set[str]:
-    if n == '':
-        return set()
-    return set(n.split('.'))
+FINAL_RATE = sum(FLOW_RATES.values())
 
-def pack_nodes(n: set[str]):
-    return '.'.join(sorted(list(n)))
+def distance(s: str, d: str, path = set()) -> int:
+    if s == d:
+        return 0
 
+    paths = []
+    for node in [x for x in NETWORK[s] if x not in path]:
+        visited = copy(path)
+        visited.add(node)
+        foo = distance(node, d, visited) 
+        if foo != None:
+            paths.append(1 + foo)
+
+    if len(paths) == 0:
+        return None 
+
+    return min(paths)
+    
+DISTANCE_TABLE = dict() 
+USEFULL_NODES = [node for (node, rate) in FLOW_RATES.items() if rate > 0]
+USEFULL_NODES.append('AA')
+
+for a, b in list(combinations(USEFULL_NODES, 2)):
+    DISTANCE_TABLE[(a, b)] = distance(a, b, set(a))
+    DISTANCE_TABLE[(b, a)] = distance(b, a, set(b))
+
+USEFULL_NODES.remove('AA')
+
+def possible_paths(start, budget, exclude = None):
+    if exclude == None: exclude = set()
+    if budget >= 1:
+        yield [start]
+    for n in USEFULL_NODES:
+        if start == n: continue
+        if n in exclude: continue
+        cost = DISTANCE_TABLE[start, n]
+        if budget >= cost + 2:
+            for path in possible_paths(n, budget - cost - 1, exclude | set([start])):
+                yield [start] + path
+    
 @functools.cache
-def solve(current_node: str, time: int, enp: str) -> list[int]:
-    enabled_nodes = unpack_nodes(enp) 
-
-    rate = sum([FLOW_RATES[node] for node in enabled_nodes])
-    
-    if time == 30:
-        return []
-
-    best_node = None
-    best_solution = 0
-    options = dict()
-    
-    # If the current node is not enabled AND it's flow rate is more than 0 consider enabling it
-    if current_node not in enabled_nodes and FLOW_RATES[current_node] > 0:
-        solution = [rate] + solve(current_node, time+1, pack_nodes(enabled_nodes.union(set([current_node]))))
-        options[current_node] = solution
+def path_value(path, budget) -> int:
+    value = 0
+    for cur, next in zip(path[0:], path[1:]):
+        budget -= DISTANCE_TABLE[cur, next] 
+        node_rate = FLOW_RATES[next]
+        if node_rate > 0:
+            budget -= 1
+            value += node_rate * budget
         
-        # Make it our current best option
-        best_node = current_node
-        best_solution = sum(solution)
+    return value
 
-    # Look for other options
-    for connected_node in NETWORK[current_node]:
-        # Move to each connected node
-        solution = [rate] + solve(connected_node, time+1, pack_nodes(enabled_nodes))
-        options[connected_node] = solution
+best = 0
+for pp in possible_paths('AA', 30):
+    best = max(best, path_value(tuple(pp), 30))
 
-        if best_node is None or sum(solution) > best_solution:
-            best_node = connected_node
-            best_solution = sum(solution)
+print(best)
 
-    assert best_node != None
-
-    # Return the best option
-    return options[best_node]
-
-solution = solve('AA', 0, '')
-print(solution)
-print(sum(solution))
+best = 0
+count = 0
+for p1 in possible_paths('AA', 26):
+    print(count)
+    for p2 in possible_paths('AA', 26, exclude=set(p1)):
+        best = max(best, path_value(tuple(p1), 26) + path_value(tuple(p2), 26))
+    count += 1
+print(best)
