@@ -1,7 +1,6 @@
 import re
 import sys
 import functools
-from itertools import combinations, permutations
 from copy import copy
 
 input = open(sys.argv[1] if len(sys.argv) >= 2 else 'example').read()
@@ -26,13 +25,26 @@ def pack_nodes(n: set[str]):
     return '.'.join(sorted(list(n)))
 
 
-destinations = [node for node, rate in FLOW_RATES.items() if rate > 0]
-i = 0
-for c in permutations(destinations, len(destinations)):
-    i += 1
+def find_valuable_nodes(source: str, depth: int, excluding: list[str]) -> list[tuple[str, int]]:
+    output = dict()
+    for connected_node in NETWORK[source]:
+        if connected_node in excluding:
+            continue
+        if FLOW_RATES[connected_node] > 0:
+            output[connected_node] = depth
+        else:
+            for (new_node, distance) in find_valuable_nodes(connected_node, depth + 1, excluding + [connected_node]):
+                key = source + '.' + new_node
+                if key in output and output[key] > distance:
+                    output[key] = distance
+                elif new_node not in output:
+                    output[key] = distance
 
-print(i)
-exit(0)
+
+    return output.items()
+
+# print(find_valuable_nodes('AA', 1, []))
+# exit()
 
 @functools.cache
 def solve(your_node: str, elephant_node: str, time: int, enp: str) -> list[int]:
@@ -44,7 +56,6 @@ def solve(your_node: str, elephant_node: str, time: int, enp: str) -> list[int]:
         return []
 
     if rate == FINAL_RATE:
-        # print("FINAL RATE")
         return [FINAL_RATE] * (26 - time)
 
     best_node = None
@@ -65,7 +76,7 @@ def solve(your_node: str, elephant_node: str, time: int, enp: str) -> list[int]:
 
             if elephant_move in enabled_nodes and len(NETWORK[elephant_move]) == 1:
                 continue
-
+            
             new_nodes = enabled_nodes
             if your_move == your_node:
                 new_nodes = copy(enabled_nodes)
