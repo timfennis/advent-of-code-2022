@@ -17,77 +17,121 @@ for line in input.split('\n'):
 
 FINAL_RATE = sum(FLOW_RATES.values())
 
-def unpack_nodes(n: str) -> set[str]:
-    if n == '':
-        return set()
-    return set(n.split('.'))
+def distance(s: str, d: str, path = set()) -> int:
+    if s == d:
+        return 0
 
-def pack_nodes(n: set[str]):
-    return '.'.join(sorted(list(n)))
+    paths = []
+    for node in [x for x in NETWORK[s] if x not in path]:
+        visited = copy(path)
+        visited.add(node)
+        foo = distance(node, d, visited) 
+        if foo != None:
+            paths.append(1 + foo)
 
+    if len(paths) == 0:
+        return None 
 
-destinations = [node for node, rate in FLOW_RATES.items() if rate > 0]
-i = 0
-for c in permutations(destinations, len(destinations)):
-    i += 1
-
-print(i)
-exit(0)
-
-@functools.cache
-def solve(your_node: str, elephant_node: str, time: int, enp: str) -> list[int]:
-    enabled_nodes = unpack_nodes(enp) 
-
-    rate = sum([FLOW_RATES[node] for node in enabled_nodes])
+    return min(paths)
     
-    if time == 26:
-        return []
+DISTANCE_TABLE = dict() 
+USEFULL_NODES = [node for (node, rate) in FLOW_RATES.items() if rate > 0]
+USEFULL_NODES.append('AA')
 
-    if rate == FINAL_RATE:
-        # print("FINAL RATE")
-        return [FINAL_RATE] * (26 - time)
+for a, b in list(combinations(USEFULL_NODES, 2)):
+    DISTANCE_TABLE[(a, b)] = distance(a, b, set(a))
+    DISTANCE_TABLE[(b, a)] = distance(b, a, set(b))
 
-    best_node = None
-    best_solution = -1
-    options = dict()
+USEFULL_NODES.remove('AA')
+
+@functools.lru_cache(maxsize=None)
+def solve(our_loc: str, ele_loc: str, our_time: int, ele_time: int, opened_valves: frozenset[str]) -> int:
+
+    rate = sum([FLOW_RATES[node] for node in opened_valves])
+
+    # if our_time == 26 and ele_time == 26:
+        # return 0
 
     # Look for other options
-    your_options = [your_node] if your_node not in enabled_nodes and FLOW_RATES[your_node] > 0 else []
-    elephant_options = [elephant_node] if elephant_node not in enabled_nodes and FLOW_RATES[elephant_node] > 0 else []
+    destinations = [node for node in USEFULL_NODES if node not in opened_valves]
 
-    your_options += NETWORK[your_node]
-    elephant_options += NETWORK[elephant_node]
-
-    for your_move in your_options:
-        for elephant_move in elephant_options:
-            if your_move in enabled_nodes and len(NETWORK[your_move]) == 1:
+    # 
+    options = []
+    for our_next_loc in destinations:
+        for ele_next_loc in destinations:
+            # We dont' want to go to the same location
+            if our_next_loc == ele_next_loc:
                 continue
+     
+            our_cost, ele_cost = 1, 1
 
-            if elephant_move in enabled_nodes and len(NETWORK[elephant_move]) == 1:
-                continue
+            valves_opened_now = []
+            if our_next_loc == our_loc:
+                valves_opened_now.append(our_loc)
+            else:
+                our_cost = DISTANCE_TABLE[(our_loc, our_next_loc)]
+                # Skip options that are too expensive
+                if our_time + our_cost > 26:
+                    continue
+            # If we stay, open valve
+            if ele_next_loc == ele_loc:
+                valves_opened_now.append(ele_loc)
+            else:
+                ele_cost = DISTANCE_TABLE[(ele_loc, ele_next_loc)]
+                # Skip options that are too expensive
+                if ele_time + ele_cost > 26:
+                    continue
 
-            new_nodes = enabled_nodes
-            if your_move == your_node:
-                new_nodes = copy(enabled_nodes)
-                new_nodes.add(your_node)
-            if elephant_move == elephant_node:
-                new_nodes = copy(enabled_nodes)
-                new_nodes.add(elephant_node)
-            
-            solution = [rate] + solve(your_move, elephant_move, time + 1, pack_nodes(new_nodes))
-            solution_key = your_move + '.' + elephant_move
-            options[solution_key] = solution
-            solution_score = sum(solution)
-
-            if solution_score > best_solution:
-                best_node = solution_key
-                best_solution = solution_score
-
-    assert best_node != None
+            solution = rate + solve(our_next_loc, ele_next_loc,
+                our_time + our_cost, ele_time + ele_cost,
+                opened_valves.union(frozenset(valves_opened_now))
+            )
+            options.append(solution)
+    
+    if len(options) == 0:
+        return rate
 
     # Return the best option
-    return options[best_node]
+    return max(options)
 
-solution = solve('AA', 'AA', 0, '')
-print(solution)
-print(sum(solution))
+# solution = solve('AA', 'AA', 0, 0, frozenset())
+# print(solution)
+
+def possible_paths(start, budget, exclude = None):
+    if exclude == None: exclude = set()
+    if budget >= 1:
+        yield [start]
+    for n in USEFULL_NODES:
+        if start == n: continue
+        if n in exclude: continue
+        cost = DISTANCE_TABLE[start, n]
+        if budget >= cost + 2:
+            for path in possible_paths(n, budget - cost - 1, exclude | set([start])):
+                yield [start] + path
+    
+@functools.cache
+def path_value(path, budget) -> int:
+    value = 0
+    for cur, next in zip(path[0:], path[1:]):
+        budget -= DISTANCE_TABLE[cur, next] 
+        node_rate = FLOW_RATES[next]
+        if node_rate > 0:
+            budget -= 1
+            value += node_rate * budget
+        
+    return value
+
+best = 0
+for pp in possible_paths('AA', 30):
+    best = max(best, path_value(tuple(pp), 30))
+
+print(best)
+
+best = 0
+count = 0
+for p1 in possible_paths('AA', 26):
+    print(count)
+    for p2 in possible_paths('AA', 26, exclude=set(p1)):
+        best = max(best, path_value(tuple(p1), 26) + path_value(tuple(p2), 26))
+    count += 1
+print(best)

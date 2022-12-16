@@ -1,1 +1,3 @@
-print([15] * (26 - 14))
+f = frozenset(['x'])
+
+print(f.union(frozenset(['y'])))
