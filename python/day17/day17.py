@@ -1,7 +1,5 @@
 instructions = open('input').read()
-# instructions = open('example').read()
 total_different_instructions = sum([1 for x in instructions if x in ['>', '<']])
-
 
 rocks = [
     # RRRR
@@ -95,8 +93,9 @@ def sim_tower(h: int):
         
         rock_idx += 1
         collide = False
-        
-        while collide == False: # No collission
+
+        # As long as we haven't collided on a down move 
+        while collide == False:
             instruction = instructions[jet_idx]
             if instruction == '>':
                 direction = directions['right']
@@ -111,49 +110,25 @@ def sim_tower(h: int):
             jet_idx += 1
             jet_idx %= len(instructions)
 
-            # Check if downward movement is possible
-
+            # Move down if possible
             collide = collides_with_tower(tower, rock, directions['down'])
             if collide == False:
                 rock = move(rock, directions['down'])
-                # print('-- moving down --')
-
-                # print_tower(tower | set(rock))
             else:
                 tower |= set(rock)
 
     return (tower, get_tower_height(tower))
-        # if get_tower_height(tower) == 2767:
-        #     print(rock_idx - 97)
-        #     exit()
 
-_, h1 = sim_tower(97 + 1715)
-_, h2 = sim_tower(97 + 1715 + 1633)
-# print_tower_rev(tower)
+def solve(simulation_count, pad_rocks, pad_height, rock_inc, height_inc):
+    simulations_minus_padding = (simulation_count-pad_rocks)
+    simulations_remaining = simulations_minus_padding % rock_inc
+    multiplier = simulations_minus_padding // rock_inc
+    
+    calculated_height = multiplier * height_inc
 
-# print("height", get_tower_height(tower))
+    _, h1 = sim_tower(pad_rocks + rock_inc)
+    _, h2 = sim_tower(pad_rocks + rock_inc + simulations_remaining)
+    return calculated_height + pad_height + (h2 - h1)
 
-# pad_rocks = 15
-# pad_height = 25
-# rock_inc = 35
-# height_inc = 53
-
-######
-desired_rock_sim = 1000000000000
-pad_rocks = 97
-pad_height = 151
-rock_inc = 1715
-height_inc = 2616
-
-rock_sim = (desired_rock_sim-pad_rocks)
-print("Simulations needed after padding is removed", rock_sim)
-mod = rock_sim % rock_inc
-div = rock_sim // rock_inc
-height = div * height_inc
-print("Simulations remaining afterwards", mod)
-
-print(height + pad_height)
-print(height + pad_height + (h2 - h1)) # NOT EVEN SURE WHY THIS IS CORRECT
-# print(1514285714288)
-
-# 1525364431490 too high
+print(solve(2022, 97, 151, 1715, 2616))
+print(solve(1000000000000, 97, 151, 1715, 2616))
