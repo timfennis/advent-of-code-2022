@@ -1,6 +1,4 @@
 input = open('input').read()
-# input = open('example').read()
-
 
 def calc(humn):
     D = dict()
@@ -15,7 +13,6 @@ def calc(humn):
             if val == 'root':
                 a, b = op.split(' + ')
                 if a in D.keys() and b in D.keys():
-                    # print(D[a], D[b], i)
                     return (D[a], D[b], D[a] == D[b])
             if val not in D.keys():
                 if '+' in op:
@@ -46,19 +43,22 @@ def calc(humn):
                     D[val] = int(op)
     return D['root']
 
-# print(clac(585))
-# print(clac(586))
-# x, _, _ = clac(0)
+lower_bound = None
+upper_bound = None
 
-lower_bound = 1000000000000
-upper_bound = 10000000000000
+for i in range(20):
+    upper_bound = 10 ** i
+    a, b, _ = calc(upper_bound)
+    if a - b < 0:
+        break
+    else:
+        lower_bound = upper_bound
 
 while True:
     human_number = lower_bound + ((upper_bound - lower_bound) // 2)
     
     a, b, _ = calc(human_number)
 
-    print(lower_bound, upper_bound, human_number, a, b, a - b)
     outcome = a - b
     if outcome < 0:
         upper_bound = human_number
@@ -68,6 +68,3 @@ while True:
         print(human_number)
         break
     
-
-# current(100) = 55_641_397_879_860
-# target       =  6_745_394_553_620
