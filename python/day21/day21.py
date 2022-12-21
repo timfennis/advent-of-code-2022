@@ -8,7 +8,7 @@ def calc(humn):
         for line in input.split('\n'):
             val, op = line.split(': ')
 
-            if val == 'humn':
+            if val == 'humn' and humn is not None:
                 D['humn'] = humn
             if val == 'root':
                 a, b = op.split(' + ')
@@ -43,6 +43,10 @@ def calc(humn):
                     D[val] = int(op)
     return D['root']
 
+# part 1
+a, b, _ = calc(None)
+print("part 1", a + b)
+
 lower_bound = None
 upper_bound = None
 
@@ -54,7 +58,8 @@ for i in range(20):
     else:
         lower_bound = upper_bound
 
-while True:
+outcome = -1
+while outcome != 0:
     human_number = lower_bound + ((upper_bound - lower_bound) // 2)
     
     a, b, _ = calc(human_number)
@@ -64,7 +69,5 @@ while True:
         upper_bound = human_number
     elif outcome > 0:
         lower_bound = human_number
-    else:
-        print(human_number)
-        break
     
+print("part 2", human_number)
