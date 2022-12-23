@@ -4,7 +4,7 @@ data = open('input').read()
 def print_grid():
     for y in range(min_x -1, max_y+2):
         for x in range(min_y - 1, max_x+2):
-            print('#' if (y,x) in elves.keys() else '.', end='')
+            print('#' if (y,x) in elves else '.', end='')
         print()
 
 elves = dict()
@@ -31,7 +31,7 @@ while True:
         all_clear = True
         for dr, dc in dirs8:
             nr, nc =  cr + dr, cc + dc
-            if (nr, nc) in elves.keys():
+            if (nr, nc) in elves:
                 all_clear = False
                 break
 
@@ -40,7 +40,7 @@ while True:
                 hit = False
                 for dr, dc in dirs:
                     nr, nc = cr + dr, cc + dc
-                    if (nr, nc) in elves.keys():
+                    if (nr, nc) in elves:
                         hit = True
                         break
                 if not hit:
@@ -76,7 +76,7 @@ while True:
         elves = new_elves
 
     if num == 10:
-        min_x = min(x for y, x in elves.keys())
+        min_x = min(x for y, x in elves)
         max_x = max(x for y, x in elves.keys())
         min_y = min(y for y, x in elves.keys())
         max_y = max(y for y, x in elves.keys())
