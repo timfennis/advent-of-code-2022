@@ -1,11 +1,17 @@
 from collections import deque
+import os
 data = open('input').read()
 
 def print_grid():
-    for y in range(min_x -1, max_y+2):
-        for x in range(min_y - 1, max_x+2):
-            print('#' if (y,x) in elves else '.', end='')
-        print()
+    os.system('clear')
+    min_x = min(x for y, x in elves)
+    max_x = max(x for y, x in elves.keys())
+    min_y = min(y for y, x in elves.keys())
+    max_y = max(y for y, x in elves.keys())
+    buf = ''
+    for y in range(min_y -1, max_y+2):
+        buf += ''.join(['#' if (y,x) in elves else '.' for x in range(min_x - 1, max_x+2)]) + '\n'
+    print(buf)
 
 elves = dict()
 
@@ -27,6 +33,7 @@ dirs4 = deque([
 
 num = 0
 while True:
+    # print_grid()
     for ((cr, cc), _) in elves.items():
         all_clear = True
         for dr, dc in dirs8:
