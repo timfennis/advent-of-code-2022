@@ -105,29 +105,31 @@ def blizz_at_time(time):
 
 def bfs(start, end, repeat = 0, time = 1):
     dirs = [(1, 0), (-1, 0), (0, 1), (0, -1), (0, 0)]
-    queue = deque()
-    queue.append(start + (time,))
+    queue = {start + (time,)}
+    
     seen = set()
 
-    while len(queue) > 0:
-        cr, cc, time = queue.popleft()
-        blizz = blizz_at_time(time)
-        
-        for dr, dc in dirs:
-            nr, nc = cr + dr, cc + dc
-            if nr < 0: continue
-            if any(nr == r and nc == c for r, c, _ in blizz): continue
-            if (nr, nc) in WALLS: continue
-            if (nr, nc) == end and repeat == 0: return time
-            if (nr, nc) == end and repeat > 0:
-                seen.clear()
-                print('Intermediate', time)
-                return bfs(end, start, repeat - 1, time + 1)
-            if (nr, nc, time + 1) in seen: continue
+    while True:
+        next_queue = set()
+        while len(queue):
+            cr, cc, time = queue.pop()
+            blizz = blizz_at_time(time)
+            for dr, dc in dirs:
+                nr, nc = cr + dr, cc + dc
+                if nr not in range(0, 26 + 1): continue
+                if any(nr == r and nc == c for r, c, _ in blizz): continue
+                if (nr, nc) in WALLS: continue
+                if (nr, nc) == end and repeat == 0: return time
+                if (nr, nc) == end and repeat > 0:
+                    seen.clear()
+                    print('Intermediate', time)
+                    return bfs(end, start, repeat - 1, time + 1)
+                if (nr, nc, time + 1) in seen: continue
 
-            seen.add((nr, nc, time + 1))
+                seen.add((nr, nc, time + 1))
 
-            queue.append((nr, nc, time + 1))
+                next_queue.add((nr, nc, time + 1))
+        queue = next_queue
 
 print(start, end)
 print(bfs(start, end, 2)) 
