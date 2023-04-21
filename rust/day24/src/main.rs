@@ -94,3 +94,65 @@ fn solve(
         time += 1;
     }
 }
+
+
+fn all_blizzards(max_row: u32, max_col: u32) {
+    for (row, col, dr, dc) in blizz.iter_mut() {
+        *row = (*row + *dr).rem_euclid(max_row + 1);
+        *col = (*col + *dc).rem_euclid(max_col + 1);
+    }
+}
+fn solve_prio(
+    start: (i32, i32),
+    end: (i32, i32),
+    repeats: u8,
+    blizz: &Vec<Blizzard>,
+    max_row: i32,
+    max_col: i32,
+) -> i32 {
+    let mut blizz = blizz.to_owned();
+    let dirs = [(-1, 0), (1, 0), (0, -1), (0, 1), (0, 0)];
+    let mut time = 1;
+    let mut queue = Vec::new();
+    let mut target = end;
+    let mut repeats = repeats;
+    queue.push(start);
+
+    loop {
+        'bfs: while let Some((cr, cc)) = queue.pop() {
+            // Update the blizzard
+            // println!("Evaluating {cr} {cc}");
+            for (dr, dc) in dirs {
+                let (nr, nc) = ((cr + dr), (cc + dc));
+                if (nr, nc) == target {
+                    if repeats == 0 {
+                        return time;
+                    } else if repeats % 2 == 0 {
+                        repeats -= 1;
+                        target = start;
+                        next_queue.clear();
+                        queue.clear();
+                        next_queue.insert(end);
+                        break 'bfs;
+                    } else {
+                        repeats -= 1;
+                        target = end;
+                        next_queue.clear();
+                        queue.clear();
+                        next_queue.insert(start);
+                        break 'bfs;
+                    }
+                }
+                if (nr, nc) != start && (nr < 0 || nr > max_row || nc < 0 || nc > max_col) {
+                    continue;
+                }
+                if blizz.iter().any(|(br, bc, _, _)| *br == nr && *bc == nc) {
+                    continue;
+                }
+                next_queue.insert((nr, nc));
+            }
+        }
+        queue = Vec::from_iter(next_queue.into_iter());
+        time += 1;
+    }
+}
