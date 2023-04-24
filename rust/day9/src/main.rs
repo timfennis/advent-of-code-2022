@@ -33,5 +33,5 @@ fn solve<const N: usize>() -> Vec<HashSet<(i32, i32)>> {
         }
     }
 
-    return visited;
+    visited
 }
